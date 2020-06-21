@@ -5,7 +5,7 @@ import pytest
 from bmtext import meta
 
 
-FIXTURE_DIR = Path(__file__).resolve(True).parent / 'fixtures'
+FIXTURE_DIR = Path(__file__).resolve(True).parent / "fixtures"
 
 
 def test_parse_line_tokens():
@@ -120,11 +120,10 @@ def test_Char_char():
 
 
 def test_parse_file():
-    path = FIXTURE_DIR / 'raleway-30/raleway-thin-32.fnt'
-    with path.open() as f:
-        font = meta.parse_file(f)
-    
-    assert font.info.face == 'Raleway'
+    path = FIXTURE_DIR / "raleway-30/raleway-thin-32.fnt"
+    font = meta.parse_file(path)
+
+    assert font.info.face == "Raleway"
     assert len(font.char_map) == 193
     assert len(font.kerning_map) == 1085
     assert font.char_map[246].char() == "ö"
@@ -133,3 +132,57 @@ def test_parse_file():
 @pytest.mark.skip("Test not implemented")
 def test_invalid_input_file():
     pass
+
+
+def test_position_char():
+    path = FIXTURE_DIR / "raleway-30/raleway-thin-32.fnt"
+    font = meta.parse_file(path)
+    
+    gi = font.position_char(font.char_map[65])
+    assert gi.source_bounds == (48, 81, 48+15, 81+16)
+    assert gi.dest_location == (0, 11)
+    assert gi.xadvance == 16
+
+
+def test_kerned_position_char():
+    path = FIXTURE_DIR / "raleway-30/raleway-thin-32.fnt"
+    font = meta.parse_file(path)
+    
+    gi = font.position_char(font.char_map[111], font.char_map[84])
+
+    'o: char id=111  x=198   y=110   width=12    height=12    xoffset=1     yoffset=15    xadvance=14    page=0  chnl=15'
+    assert gi.source_bounds == (198, 110, 198+12, 110+12)
+    assert gi.dest_location == (-2, 15)
+    assert gi.xadvance == 11
+
+
+def test_position_char_with_xadvance():
+    path = FIXTURE_DIR / "raleway-30/raleway-thin-32.fnt"
+    font = meta.parse_file(path)
+    
+    gi = font.position_char(font.char_map[111], None)
+
+    'o: char id=111  x=198   y=110   width=12    height=12    xoffset=1     yoffset=15    xadvance=14    page=0  chnl=15'
+    assert gi.source_bounds == (198, 110, 198+12, 110+12)
+    assert gi.dest_location == (0, 15)
+    assert gi.xadvance == 14 -1 # xoffset gets subtracted for first char advance (because instead of being offset, it's printed at zero)
+
+def test_glyph_positions():
+    # T width=14 height=16 xoffset=0 yoffset=11 xadvance=14
+    # o width=12 height=12 xoffset=1 yoffset=15 xadvance=14
+    # T-o amount=-3
+
+    path = FIXTURE_DIR / "raleway-30/raleway-thin-32.fnt"
+    font = meta.parse_file(path)
+    t, o, t2, o2 = font.glyph_positions("ToTo")
+    assert t.source_bounds == (230, 76, 244, 92)
+    assert t.dest_location == (0, 11)
+    assert t.xadvance == 14
+    assert o.source_bounds == (198, 110, 198+12, 110+12)
+    # x = T.xoffset + T.xadvance + kerning + o.xoffset
+    # x = 0         + 14         - 3       + 1
+    assert o.dest_location == (14 - 3 + 1, 15)
+    #assert o.xadvance == 14
+
+    assert t2.dest_location == (14 - 3 + 14 - 3, 11)
+    assert o2.dest_location == (14 - 3 + 14 - 3 + 14 - 3 + 1, 15)

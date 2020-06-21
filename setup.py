@@ -1,5 +1,16 @@
 from setuptools import setup, find_packages
 
+PILLOW_DEPS = [
+    "pillow ~= 7.1",
+]
+
+DEV_DEPS =  [
+            "black",
+            "pytest",
+            "twine",
+            "wheel",
+        ] + PILLOW_DEPS
+
 setup(
     name="bmtext",
     description="Render text from BMFont bitmap fonts.",
@@ -12,12 +23,7 @@ setup(
         "attrs~=19.3",
     ],
     extras_require={
-        "dev": [
-            "black",
-            "pytest",
-            "twine",
-            "wheel",
-        ]
+        "dev": DEV_DEPS,
+        "pillow": PILLOW_DEPS,
     },
-    
 )
