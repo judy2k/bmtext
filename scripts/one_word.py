@@ -9,10 +9,11 @@ from bmtext.meta import parse_file
 from bmtext.pil import BMText
 
 def main():
-    im = Image.new('RGB', (300, 100), color='white')
+    im = Image.new('RGB', (360, 160), color=(160, 160, 255))
     bm = BMText(im)
     font = parse_file("tests/fixtures/raleway-30/raleway-thin-32.fnt")
-    bm.text((0, 0), "!m!m!", font, fill='red')
+    # FIXME: Overlapping glyphs remove part of previous char.
+    bm.text((10, 10), "Antidisestablishmentarianism\nThorough\nSHOUTING!!!", font, fill='blue')
     im.show()
 
 if __name__ == "__main__":

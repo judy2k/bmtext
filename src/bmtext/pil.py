@@ -1,5 +1,5 @@
 import attr
-from PIL import Image
+from PIL import Image, ImageChops
 from typing import Dict
 
 from . import meta
@@ -34,7 +34,10 @@ class BMText:
         mask = Image.new('L', self._image.size, 'black')
         loaded_font = self._load_font(font)
         for g in font.glyph_positions(text, kerning):
-            mask.paste(
+            letter_mask = Image.new('L', self._image.size, 'black')
+            letter_mask.paste(
                 loaded_font.char_image(g.char),
                 g.dest_location)
+            mask = ImageChops.lighter(mask, letter_mask)
+            
         self._image.paste(Image.new('RGB', mask.size, color=fill), xy, mask=mask)
