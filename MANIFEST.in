@@ -1,0 +1,6 @@
+include Makefile
+recursive-include assets *.png
+recursive-include scripts *.py
+recursive-include tests *.fnt
+recursive-include tests *.png
+recursive-include tests *.py
