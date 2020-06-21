@@ -34,7 +34,7 @@ drawer.text((5, 5), "Antidisestablishmentarianism\nThorough\nSHOUTING!!!\nTomato
 im.show()
 ```
 
-![Sample of rendered text](assets/rendered_text.png)
+![Sample of rendered text](https://github.com/judy2k/bmtext/blob/master/assets/rendered_text.png)
 
 ## To Do
 * FNT Compatibility:
